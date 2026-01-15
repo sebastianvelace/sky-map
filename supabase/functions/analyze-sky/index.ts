@@ -1,10 +1,44 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Allowed origins - restrict to your app domains only
+const ALLOWED_ORIGINS = [
+  'https://id-preview--0e5b7791-a2db-4a38-834f-a3d5605b4cd4.lovable.app',
+  'https://sky-map-bogota.lovable.app',
+  'http://localhost:8080',
+  'http://localhost:5173',
+];
+
+// Simple in-memory rate limiting (resets on function cold start)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 10; // requests per window
+const RATE_WINDOW_MS = 60 * 1000; // 1 minute
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
+}
+
+function checkRateLimit(clientId: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(clientId);
+
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(clientId, { count: 1, resetTime: now + RATE_WINDOW_MS });
+    return { allowed: true, remaining: RATE_LIMIT - 1 };
+  }
+
+  if (record.count >= RATE_LIMIT) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  record.count++;
+  return { allowed: true, remaining: RATE_LIMIT - record.count };
+}
 
 const ANALYSIS_PROMPT = `Analiza esta foto del cielo nocturno tomada en Bogotá, Colombia (latitud ~4.6°N, altitud ~2600m, posible contaminación lumínica). 
 
@@ -27,9 +61,44 @@ Ejemplo de formato:
 • **Sirius** - La más brillante...`;
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Validate origin
+  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+    console.warn('Blocked request from unauthorized origin:', origin);
+    return new Response(
+      JSON.stringify({ error: 'Origen no autorizado' }),
+      { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  // Rate limiting by IP or fallback identifier
+  const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                   req.headers.get('cf-connecting-ip') || 
+                   'unknown';
+  
+  const { allowed, remaining } = checkRateLimit(clientIP);
+  
+  if (!allowed) {
+    console.warn('Rate limit exceeded for client:', clientIP);
+    return new Response(
+      JSON.stringify({ error: '¡Demasiadas solicitudes! Espera un minuto antes de intentar de nuevo. ⏳' }),
+      { 
+        status: 429, 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json',
+          'X-RateLimit-Remaining': '0',
+          'Retry-After': '60'
+        } 
+      }
+    );
   }
 
   try {
@@ -38,6 +107,23 @@ serve(async (req) => {
     if (!imageBase64 || !mimeType) {
       return new Response(
         JSON.stringify({ error: 'Se requiere una imagen para analizar' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate mime type
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+    if (!allowedMimeTypes.includes(mimeType)) {
+      return new Response(
+        JSON.stringify({ error: 'Formato de imagen no válido. Usa JPG, PNG o WebP.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate base64 size (max ~10MB image)
+    if (imageBase64.length > 10 * 1024 * 1024 * 1.37) {
+      return new Response(
+        JSON.stringify({ error: 'La imagen es demasiado grande. Máximo 10MB.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -52,7 +138,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Calling Gemini API with model gemini-2.5-flash...');
+    console.log('Calling Gemini API for client:', clientIP, 'Remaining requests:', remaining);
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
@@ -91,7 +177,7 @@ serve(async (req) => {
       
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: '¡Demasiadas solicitudes! Espera un momento e intenta de nuevo.' }),
+          JSON.stringify({ error: '¡Demasiadas solicitudes al servicio de IA! Espera un momento e intenta de nuevo.' }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -123,7 +209,13 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ result: analysisResult }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json',
+          'X-RateLimit-Remaining': remaining.toString()
+        } 
+      }
     );
 
   } catch (error) {
