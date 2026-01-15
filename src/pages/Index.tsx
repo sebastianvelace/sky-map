@@ -1,26 +1,17 @@
 import { useState, useRef } from 'react';
-import { Camera, Telescope, Settings, AlertCircle, Sparkles, Star } from 'lucide-react';
+import { Camera, Telescope, AlertCircle, Sparkles, Star } from 'lucide-react';
 import StarField from '@/components/StarField';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import SettingsModal from '@/components/SettingsModal';
 import ResultCard from '@/components/ResultCard';
-
-const ANALYSIS_PROMPT = `Analiza esta foto del cielo nocturno tomada en Bogotá, Colombia (latitud ~4.6°N, altitud ~2600m, posible contaminación lumínica). Identifica las constelaciones y estrellas principales visibles con alta confianza. Para cada una incluye: nombre común, breve descripción y 2-3 datos curiosos divertidos o interesantes (mitología, ciencia, historia). Responde SIEMPRE en español, de forma entusiasta, amigable y educativa como un astrónomo apasionado guiando a un amigo. Usa emojis, formato bonito con listas y encabezados. Ejemplo: 🌟 ¡Wow, qué cielo! Constelaciones: • Orion - El cazador... Datos curiosos: 1. ... Estrellas: • Sirius - La más brillante...`;
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [image, setImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleApiKeyChange = (key: string) => {
-    setApiKey(key);
-    localStorage.setItem('gemini_api_key', key);
-  };
 
   const handleImageCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,11 +36,6 @@ const Index = () => {
       return;
     }
 
-    if (!apiKey) {
-      setError('Necesitas configurar tu API Key de Gemini. Haz clic en ⚙️ para agregarla.');
-      return;
-    }
-
     setIsAnalyzing(true);
     setError(null);
 
@@ -58,51 +44,23 @@ const Index = () => {
       const base64Data = image.split(',')[1];
       const mimeType = image.split(';')[0].split(':')[1];
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  { text: ANALYSIS_PROMPT },
-                  {
-                    inline_data: {
-                      mime_type: mimeType,
-                      data: base64Data,
-                    },
-                  },
-                ],
-              },
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 2048,
-            },
-          }),
+      const { data, error: functionError } = await supabase.functions.invoke('analyze-sky', {
+        body: { 
+          imageBase64: base64Data, 
+          mimeType 
         }
-      );
+      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        if (response.status === 429) {
-          throw new Error('Has alcanzado el límite de solicitudes. Espera unos minutos e intenta de nuevo. 🕐');
-        }
-        if (response.status === 400) {
-          throw new Error('API Key inválida. Por favor verifica tu clave en Configuración. 🔑');
-        }
-        throw new Error(errorData.error?.message || 'Error al analizar la imagen');
+      if (functionError) {
+        throw new Error(functionError.message || 'Error al conectar con el servidor');
       }
 
-      const data = await response.json();
-      const analysisResult = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
-      if (analysisResult) {
-        setResult(analysisResult);
+      if (data.result) {
+        setResult(data.result);
       } else {
         throw new Error('No se pudo obtener el análisis. Intenta con otra foto más clara del cielo. 🌃');
       }
@@ -123,15 +81,6 @@ const Index = () => {
     <div className="min-h-screen relative overflow-x-hidden">
       {/* Star background */}
       <StarField />
-
-      {/* Settings button */}
-      <button
-        onClick={() => setShowSettings(true)}
-        className="fixed top-4 right-4 z-40 p-3 bg-card/80 backdrop-blur-sm border border-border/50 rounded-full text-muted-foreground hover:text-foreground hover:bg-card transition-all shadow-cosmic"
-        aria-label="Configuración"
-      >
-        <Settings size={20} />
-      </button>
 
       {/* Main content */}
       <main className="relative z-10 container mx-auto px-4 py-8 md:py-12 max-w-2xl">
@@ -236,39 +185,15 @@ const Index = () => {
 
         {/* Footer note */}
         <footer className="mt-12 text-center">
-          <p className="text-xs text-muted-foreground/60 flex items-center justify-center gap-1 flex-wrap">
+          <p className="text-xs text-muted-foreground/60 flex items-center justify-center gap-1">
             <Star size={12} className="text-cosmic-gold" />
-            <span>Stars.ai — Pega tu Gemini API key en</span>
-            <button 
-              onClick={() => setShowSettings(true)}
-              className="text-cosmic-blue hover:underline"
-            >
-              configuración
-            </button>
-            <span>(gratis en</span>
-            <a 
-              href="https://aistudio.google.com/apikey" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-cosmic-blue hover:underline"
-            >
-              aistudio.google.com
-            </a>
-            <span>)</span>
+            <span>Stars.ai — Powered by Google Gemini ✨</span>
           </p>
           <p className="text-[10px] text-muted-foreground/40 mt-2">
             Inspirado por SpaceX & NASA 🚀
           </p>
         </footer>
       </main>
-
-      {/* Settings Modal */}
-      <SettingsModal
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-        apiKey={apiKey}
-        onApiKeyChange={handleApiKeyChange}
-      />
     </div>
   );
 };
