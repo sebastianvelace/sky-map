@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import spaceBackground from '@/assets/space-background.jpg';
 
 interface Star {
   id: number;
@@ -15,7 +16,7 @@ const StarField = () => {
   useEffect(() => {
     const generateStars = () => {
       const newStars: Star[] = [];
-      const count = 80;
+      const count = 60;
       
       for (let i = 0; i < count; i++) {
         newStars.push({
@@ -35,14 +36,23 @@ const StarField = () => {
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {/* Deep space gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-cosmic-navy/50 to-background" />
+      {/* Real space background image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${spaceBackground})` }}
+      />
       
-      {/* Nebula effect */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cosmic-blue/5 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-cosmic-purple/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+      {/* Dark overlay for better readability */}
+      <div className="absolute inset-0 bg-background/70" />
       
-      {/* Stars */}
+      {/* Gradient overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cosmic-navy/30 to-background/90" />
+      
+      {/* Subtle nebula glow effects */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cosmic-blue/10 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-cosmic-purple/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+      
+      {/* Twinkling stars overlay */}
       {stars.map((star) => (
         <div
           key={star.id}
@@ -60,9 +70,6 @@ const StarField = () => {
           }}
         />
       ))}
-      
-      {/* Shooting star occasional */}
-      <div className="absolute top-20 right-10 w-1 h-1 bg-cosmic-star rounded-full animate-float opacity-60" />
     </div>
   );
 };
