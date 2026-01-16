@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['Cinzel', 'Georgia', 'serif'],
+        sans: ['Montserrat', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Orbitron', 'Montserrat', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

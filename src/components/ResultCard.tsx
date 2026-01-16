@@ -1,5 +1,7 @@
 import { Sparkles } from 'lucide-react';
 import React from 'react';
+import ConfidenceBadge from './ConfidenceBadge';
+import TagExtractor from './TagExtractor';
 
 interface ResultCardProps {
   result: string;
@@ -86,18 +88,26 @@ const ResultCard = ({ result }: ResultCardProps) => {
   return (
     <div className="glass-card rounded-3xl p-6 md:p-8 shadow-card animate-fade-in-scale">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/30">
-        <div 
-          className="p-2 rounded-xl"
-          style={{
-            background: 'linear-gradient(135deg, hsl(45 100% 55% / 0.2) 0%, hsl(45 100% 55% / 0.1) 100%)'
-          }}
-        >
-          <Sparkles className="w-5 h-5 text-cosmic-gold" />
+      <div className="flex items-center justify-between gap-3 mb-4 pb-4 border-b border-border/30">
+        <div className="flex items-center gap-3">
+          <div 
+            className="p-2 rounded-xl"
+            style={{
+              background: 'linear-gradient(135deg, hsl(45 100% 55% / 0.2) 0%, hsl(45 100% 55% / 0.1) 100%)'
+            }}
+          >
+            <Sparkles className="w-5 h-5 text-cosmic-gold" />
+          </div>
+          <h3 className="font-display font-semibold text-lg text-foreground">
+            Análisis del Cielo
+          </h3>
         </div>
-        <h3 className="font-display font-semibold text-lg text-foreground">
-          Análisis del Cielo
-        </h3>
+        <ConfidenceBadge result={result} />
+      </div>
+      
+      {/* Tags */}
+      <div className="mb-5">
+        <TagExtractor result={result} />
       </div>
       
       {/* Content */}
