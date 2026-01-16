@@ -1,9 +1,14 @@
-import { Compass, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { Compass, Sparkles, Globe } from 'lucide-react';
 import StarField from '@/components/StarField';
 import ConstellationCard from '@/components/ConstellationCard';
-import { constellations } from '@/data/constellations';
+import RegionSelector from '@/components/RegionSelector';
+import { getConstellationsByRegion, Region, regionLabels } from '@/data/constellations';
 
 const Gallery = () => {
+  const [selectedRegion, setSelectedRegion] = useState<Region>('equatorial');
+  const constellations = getConstellationsByRegion(selectedRegion);
+
   return (
     <div className="min-h-screen relative overflow-x-hidden pt-20 pb-10">
       {/* Animated star background */}
@@ -12,7 +17,7 @@ const Gallery = () => {
       {/* Main content */}
       <main className="relative z-10 container mx-auto px-5 max-w-5xl">
         {/* Header */}
-        <header className="text-center mb-10 md:mb-14 animate-fade-in">
+        <header className="text-center mb-8 md:mb-10 animate-fade-in">
           {/* Icon */}
           <div className="inline-flex items-center justify-center mb-6">
             <div className="relative">
@@ -27,7 +32,7 @@ const Gallery = () => {
                   backdropFilter: 'blur(12px)'
                 }}
               >
-                <Compass className="w-8 h-8 md:w-10 md:h-10 text-cosmic-blue" />
+                <Globe className="w-8 h-8 md:w-10 md:h-10 text-cosmic-blue" />
               </div>
             </div>
           </div>
@@ -36,24 +41,34 @@ const Gallery = () => {
           <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
             Galería de Constelaciones
           </h1>
-          <p className="text-muted-foreground text-base max-w-md mx-auto mb-6">
-            Explora las constelaciones más impresionantes visibles desde latitudes ecuatoriales
+          <p className="text-muted-foreground text-base max-w-md mx-auto mb-8">
+            Explora las constelaciones más impresionantes visibles desde cualquier lugar del mundo
           </p>
 
-          {/* Subtitle with stars */}
-          <div className="flex items-center justify-center gap-2 text-sm text-cosmic-gold/80">
-            <Sparkles size={14} />
-            <span>Optimizado para ~4.7°N (Colombia, Ecuador, Venezuela)</span>
-            <Sparkles size={14} />
+          {/* Region Selector */}
+          <div className="max-w-2xl mx-auto">
+            <RegionSelector 
+              selectedRegion={selectedRegion} 
+              onRegionChange={setSelectedRegion} 
+            />
           </div>
         </header>
 
+        {/* Region indicator */}
+        <div className="flex items-center justify-center gap-2 mb-8 animate-fade-in">
+          <Sparkles size={14} className="text-cosmic-gold" />
+          <span className="text-sm text-cosmic-gold/80 font-medium">
+            {constellations.length} constelaciones en {regionLabels[selectedRegion]}
+          </span>
+          <Sparkles size={14} className="text-cosmic-gold" />
+        </div>
+
         {/* Constellation Grid */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 animate-fade-in">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
           {constellations.map((constellation, index) => (
             <div 
               key={constellation.id}
-              style={{ animationDelay: `${index * 0.1}s` }}
+              style={{ animationDelay: `${index * 0.08}s` }}
               className="animate-fade-in"
             >
               <ConstellationCard constellation={constellation} />
