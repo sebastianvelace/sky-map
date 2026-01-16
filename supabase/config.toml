@@ -1,1 +1,7 @@
 project_id = "lahnihullwxlteyiedti"
+
+[functions.analyze-sky]
+verify_jwt = false
+
+[functions.cosmos-qa]
+verify_jwt = false

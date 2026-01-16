@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Camera, Telescope, AlertCircle, Sparkles, Star } from 'lucide-react';
 import StarField from '@/components/StarField';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ResultCard from '@/components/ResultCard';
 import QuoteCarousel from '@/components/QuoteCarousel';
+import CosmosQA from '@/components/CosmosQA';
 import { supabase } from '@/integrations/supabase/client';
 import { useHistoryStorage } from '@/hooks/useHistoryStorage';
 
@@ -145,6 +146,7 @@ const Index = () => {
                 background: 'linear-gradient(135deg, hsl(207 90% 65%) 0%, hsl(207 90% 50%) 100%)',
                 color: 'hsl(228 35% 5%)'
               }}
+              aria-label="Tomar foto del cielo nocturno"
             >
               <Camera size={24} />
               <span>Tomar foto del cielo</span>
@@ -168,6 +170,7 @@ const Index = () => {
                 <button
                   onClick={resetApp}
                   className="flex-1 py-4 glass-button hover:bg-secondary/60 text-foreground rounded-2xl font-medium transition-all duration-300 flex items-center justify-center gap-2 border border-border/30"
+                  aria-label="Tomar nueva foto"
                 >
                   <Camera size={18} />
                   Nueva foto
@@ -181,6 +184,7 @@ const Index = () => {
                     background: 'linear-gradient(135deg, hsl(45 100% 55%) 0%, hsl(38 90% 50%) 100%)',
                     color: 'hsl(228 35% 5%)'
                   }}
+                  aria-label="Analizar imagen del cielo"
                 >
                   <Sparkles size={18} />
                   <span>Analizar mi cielo ✨</span>
@@ -195,7 +199,7 @@ const Index = () => {
 
         {/* Error message */}
         {error && (
-          <div className="glass-card rounded-2xl p-5 flex items-start gap-4 mb-8 border-destructive/30 animate-fade-in">
+          <div className="glass-card rounded-2xl p-5 flex items-start gap-4 mb-8 border-destructive/30 animate-fade-in" role="alert">
             <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
             <p className="text-foreground text-sm leading-relaxed">{error}</p>
           </div>
@@ -203,6 +207,9 @@ const Index = () => {
 
         {/* Results */}
         {result && !isAnalyzing && <ResultCard result={result} />}
+
+        {/* Q&A Section */}
+        <CosmosQA />
 
         {/* Footer note */}
         <footer className="mt-16 text-center animate-fade-in">
