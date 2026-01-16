@@ -1,73 +1,32 @@
-# Welcome to your Lovable project
+# Stars.ai 🌌  
+**Identificador de constelaciones con IA – Especial para el cielo de
 
-## Project info
+Vivo a 2.600 metros de altura, donde el cielo nocturno es espectacular cuando no hay nubes ni tanta luz de la ciudad... pero igual a veces es complicado identificar qué estás viendo.  
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Por eso creé **Stars.ai**: una app web sencilla que usa inteligencia artificial para que tomes una foto del cielo con tu celular y te diga exactamente qué constelaciones, estrellas o planetas estás mirando. Además, puedes hacerle preguntas tipo chat sobre lo que ves: "¿Esa es Orión?", "¿Cuándo veré la Cruz del Sur bien?", o curiosidades sobre mitología.
 
-## How can I edit this code?
+### Cómo usarla (súper fácil)
+1. Abre la app: https://sky-map-bogota.lovable.app  
+2. Dale al botón grande **"Tomar foto del cielo"** (usa la cámara de tu teléfono).  
+3. Sube la foto y espera unos segundos – la IA analiza las estrellas.  
+4. Pregúntale lo que quieras con **"Pregunta al Cosmos"** – ¡responde en español!  
 
-There are several ways of editing your application.
+Funciona mejor en noches claras, lejos de postes de luz, y apuntando hacia arriba. Prueba en el norte o sur de la ciudad para ver diferencias.
 
-**Use Lovable**
+### Tech stack (lo que usé debajo del capó)
+- Frontend: React + Next.js (para que sea rápida y responsive)  
+- IA para visión: Modelo de visión por computadora que detecta patrones estelares  
+- Backend: Procesamiento simple y chat integrado  
+- Deploy: En un host rápido y gratuito  
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### Capturas de pantalla
+(Aquí puedes subir 2-3 imágenes tuyas de la app en acción: una con la cámara, otra con resultados, y una con el chat. Sube las fotos al repo y pon links como ![Demo](screenshots/demo1.png))
 
-Changes made via Lovable will be committed automatically to this repo.
+### ¿Quieres contribuir o mejorar?
+¡Claro que sí! Si tienes ideas (mejor manejo de contaminación lumínica, integración con clima de Bogotá, etc.), abre un issue o un PR.  
 
-**Use your preferred IDE**
+Licencia: MIT – usa el código como quieras, solo dame crédito si lo compartes 😊
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Sebastian  
+Bogotá, enero 2026
