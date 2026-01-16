@@ -3,6 +3,7 @@ import { Camera, Telescope, AlertCircle, Sparkles, Star } from 'lucide-react';
 import StarField from '@/components/StarField';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ResultCard from '@/components/ResultCard';
+import QuoteCarousel from '@/components/QuoteCarousel';
 import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
@@ -79,40 +80,46 @@ const Index = () => {
 
   return (
     <div className="min-h-screen relative overflow-x-hidden">
-      {/* Star background */}
+      {/* Animated star background */}
       <StarField />
 
       {/* Main content */}
-      <main className="relative z-10 container mx-auto px-4 py-8 md:py-12 max-w-2xl">
+      <main className="relative z-10 container mx-auto px-5 py-10 md:py-16 max-w-xl">
         {/* Header */}
-        <header className="text-center mb-8 md:mb-12">
+        <header className="text-center mb-10 md:mb-14 animate-fade-in">
           {/* Logo/Icon */}
-          <div className="inline-flex items-center justify-center mb-6">
+          <div className="inline-flex items-center justify-center mb-8">
             <div className="relative">
-              <div className="absolute inset-0 bg-cosmic-gold/20 blur-xl rounded-full animate-pulse" />
-              <div className="relative p-4 bg-gradient-to-br from-cosmic-navy to-card border border-cosmic-gold/30 rounded-2xl shadow-glow-gold">
+              <div 
+                className="absolute inset-0 blur-2xl rounded-full animate-pulse-gold"
+                style={{ background: 'radial-gradient(circle, hsl(45 100% 55% / 0.3) 0%, transparent 70%)' }}
+              />
+              <div 
+                className="relative p-5 rounded-2xl border border-cosmic-gold/30"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(225 35% 12% / 0.8) 0%, hsl(225 35% 8% / 0.6) 100%)',
+                  backdropFilter: 'blur(12px)'
+                }}
+              >
                 <Telescope className="w-10 h-10 md:w-12 md:h-12 text-cosmic-gold" />
               </div>
             </div>
           </div>
 
           {/* Title */}
-          <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-3 tracking-tight">
-            <span className="text-cosmic-gold">★</span> Estrellas y Constelaciones
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-wide">
+            <span className="text-cosmic-gold">★</span> Stars.ai
           </h1>
-          <p className="text-muted-foreground text-base md:text-lg max-w-md mx-auto">
-            Descubre las constelaciones del cielo nocturno de Bogotá
+          <p className="text-muted-foreground text-base md:text-lg max-w-sm mx-auto mb-6">
+            Identifica estrellas y constelaciones del cielo nocturno
           </p>
 
-          {/* Quote */}
-          <blockquote className="mt-6 text-sm md:text-base text-muted-foreground/80 italic max-w-sm mx-auto border-l-2 border-cosmic-blue/50 pl-4">
-            "For small creatures such as we, the vastness is bearable only through love."
-            <footer className="text-xs text-muted-foreground/60 mt-1 not-italic">— Carl Sagan</footer>
-          </blockquote>
+          {/* Rotating quotes carousel */}
+          <QuoteCarousel />
         </header>
 
         {/* Camera capture section */}
-        <section className="space-y-4 mb-6">
+        <section className="space-y-5 mb-8">
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
@@ -127,7 +134,11 @@ const Index = () => {
           {!image && (
             <button
               onClick={triggerCamera}
-              className="w-full py-5 md:py-6 bg-gradient-button text-primary-foreground rounded-2xl font-semibold text-lg shadow-glow-blue hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-3 animate-pulse-glow"
+              className="w-full py-5 md:py-6 rounded-2xl font-semibold text-lg shadow-glow-blue hover:shadow-[0_0_50px_hsl(207_90%_70%_/_0.5)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 animate-pulse-glow btn-glow"
+              style={{
+                background: 'linear-gradient(135deg, hsl(207 90% 65%) 0%, hsl(207 90% 50%) 100%)',
+                color: 'hsl(228 35% 5%)'
+              }}
             >
               <Camera size={24} />
               <span>Tomar foto del cielo</span>
@@ -136,21 +147,21 @@ const Index = () => {
 
           {/* Image preview */}
           {image && (
-            <div className="space-y-4">
-              <div className="relative rounded-2xl overflow-hidden border border-border/50 shadow-cosmic">
+            <div className="space-y-5 animate-fade-in-scale">
+              <div className="relative rounded-3xl overflow-hidden border border-border/30 shadow-card">
                 <img
                   src={image}
                   alt="Foto del cielo nocturno"
                   className="w-full h-auto max-h-[400px] object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent pointer-events-none" />
               </div>
 
               {/* Action buttons */}
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <button
                   onClick={resetApp}
-                  className="flex-1 py-3 bg-secondary hover:bg-secondary/80 text-foreground rounded-xl font-medium transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-4 glass-button hover:bg-secondary/60 text-foreground rounded-2xl font-medium transition-all duration-300 flex items-center justify-center gap-2 border border-border/30"
                 >
                   <Camera size={18} />
                   Nueva foto
@@ -159,10 +170,14 @@ const Index = () => {
                 <button
                   onClick={analyzeImage}
                   disabled={isAnalyzing}
-                  className="flex-[2] py-3 bg-gradient-gold text-accent-foreground rounded-xl font-semibold shadow-glow-gold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed animate-pulse-gold"
+                  className="flex-[2] py-4 rounded-2xl font-semibold shadow-glow-gold hover:shadow-[0_0_50px_hsl(45_100%_55%_/_0.5)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed btn-gold-glow"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(45 100% 55%) 0%, hsl(38 90% 50%) 100%)',
+                    color: 'hsl(228 35% 5%)'
+                  }}
                 >
                   <Sparkles size={18} />
-                  <span>Analizar mi cielo 🌌</span>
+                  <span>Analizar mi cielo ✨</span>
                 </button>
               </div>
             </div>
@@ -174,9 +189,9 @@ const Index = () => {
 
         {/* Error message */}
         {error && (
-          <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 flex items-start gap-3 mb-6">
+          <div className="glass-card rounded-2xl p-5 flex items-start gap-4 mb-8 border-destructive/30 animate-fade-in">
             <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-            <p className="text-foreground text-sm">{error}</p>
+            <p className="text-foreground text-sm leading-relaxed">{error}</p>
           </div>
         )}
 
@@ -184,14 +199,12 @@ const Index = () => {
         {result && !isAnalyzing && <ResultCard result={result} />}
 
         {/* Footer note */}
-        <footer className="mt-12 text-center">
-          <p className="text-xs text-muted-foreground/60 flex items-center justify-center gap-1">
-            <Star size={12} className="text-cosmic-gold" />
-            <span>Stars.ai — Powered by Google Gemini ✨</span>
-          </p>
-          <p className="text-[10px] text-muted-foreground/40 mt-2">
-            Inspirado por SpaceX & NASA 🚀
-          </p>
+        <footer className="mt-16 text-center animate-fade-in">
+          <div className="inline-flex items-center gap-2 text-muted-foreground/50 text-xs">
+            <Star size={12} className="text-cosmic-gold/60" />
+            <span>Stars.ai — Powered by Google Gemini</span>
+            <Star size={12} className="text-cosmic-gold/60" />
+          </div>
         </footer>
       </main>
     </div>

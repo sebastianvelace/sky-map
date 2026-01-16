@@ -7,15 +7,15 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "1rem",
+      padding: "1.5rem",
       screens: {
         "2xl": "1400px",
       },
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Cinzel', 'Georgia', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -56,14 +56,19 @@ export default {
           navy: "hsl(var(--cosmic-navy))",
           blue: "hsl(var(--cosmic-blue))",
           gold: "hsl(var(--cosmic-gold))",
+          "gold-light": "hsl(var(--cosmic-gold-light))",
           purple: "hsl(var(--cosmic-purple))",
           star: "hsl(var(--cosmic-star))",
+          text: "hsl(var(--cosmic-text))",
         },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "2rem",
       },
       keyframes: {
         "accordion-down": {
@@ -83,11 +88,17 @@ export default {
         'gradient-cosmic': 'var(--gradient-cosmic)',
         'gradient-button': 'var(--gradient-button)',
         'gradient-gold': 'var(--gradient-gold)',
+        'gradient-glass': 'var(--gradient-glass)',
       },
       boxShadow: {
         'glow-blue': 'var(--shadow-glow-blue)',
         'glow-gold': 'var(--shadow-glow-gold)',
         'cosmic': 'var(--shadow-cosmic)',
+        'card': 'var(--shadow-card)',
+      },
+      spacing: {
+        '18': '4.5rem',
+        '22': '5.5rem',
       },
     },
   },
