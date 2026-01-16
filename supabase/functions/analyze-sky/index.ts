@@ -40,25 +40,39 @@ function checkRateLimit(clientId: string): { allowed: boolean; remaining: number
   return { allowed: true, remaining: RATE_LIMIT - record.count };
 }
 
-const ANALYSIS_PROMPT = `Analiza esta foto del cielo nocturno tomada en Bogotá, Colombia (latitud ~4.6°N, altitud ~2600m, posible contaminación lumínica). 
+const ANALYSIS_PROMPT = `Eres un astrónomo entusiasta y apasionado. Analiza esta foto del cielo nocturno e identifica las constelaciones y estrellas principales visibles.
 
-Identifica las constelaciones y estrellas principales visibles con alta confianza. Para cada una incluye:
-- Nombre común
-- Breve descripción
-- 2-3 datos curiosos divertidos o interesantes (mitología, ciencia, historia)
+Para cada objeto celeste identificado incluye:
+• **Nombre común** y científico si aplica
+• Breve descripción poética
+• 2-3 datos curiosos fascinantes (mitología, ciencia, historia)
 
-Responde SIEMPRE en español, de forma entusiasta, amigable y educativa como un astrónomo apasionado guiando a un amigo. Usa emojis, formato bonito con listas y encabezados.
+INSTRUCCIONES DE FORMATO (MUY IMPORTANTES):
+• Responde SIEMPRE en español
+• Sé conciso pero completo (400-800 palabras máximo)
+• Usa formato markdown limpio y elegante
+• Usa **negrita** para nombres importantes
+• Usa • para listas (NO uses guiones -)
+• Usa emojis con moderación para dar vida (🌟 ✨ 🔭 💫 🌙)
+• Organiza con encabezados ## para secciones
+• Escribe párrafos cortos y fáciles de leer
+• NO uses guiones largos ni trunces el texto
+• Completa TODA tu respuesta sin cortar
 
-Ejemplo de formato:
-🌟 ¡Wow, qué cielo!
+Ejemplo de estructura:
+🌟 ¡Qué cielo tan hermoso!
 
-## Constelaciones:
-• **Orión** - El cazador...
-  Datos curiosos:
-  1. ...
+## Constelaciones Identificadas
 
-## Estrellas:
-• **Sirius** - La más brillante...`;
+• **Orión** (El Cazador)
+  Una de las constelaciones más reconocibles...
+  ✨ Dato curioso: Las tres estrellas del cinturón...
+
+## Estrellas Destacadas
+
+• **Sirio** — La estrella más brillante del cielo nocturno...
+
+Sé amigable y educativo, como un guía apasionado mostrando el cosmos a un amigo.`;
 
 serve(async (req) => {
   const origin = req.headers.get('origin');
@@ -165,7 +179,7 @@ serve(async (req) => {
             temperature: 0.7,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 4096,
           },
         }),
       }
