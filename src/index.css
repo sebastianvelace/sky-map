@@ -74,14 +74,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
     background: var(--gradient-cosmic);
     min-height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Cinzel', Georgia, serif;
-    letter-spacing: 0.02em;
+    font-family: 'Orbitron', 'Montserrat', sans-serif;
+    letter-spacing: 0.05em;
   }
 }
 

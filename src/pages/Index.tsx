@@ -1,12 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Camera, Telescope, AlertCircle, Sparkles, Star } from 'lucide-react';
 import StarField from '@/components/StarField';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ResultCard from '@/components/ResultCard';
 import QuoteCarousel from '@/components/QuoteCarousel';
 import { supabase } from '@/integrations/supabase/client';
+import { useHistoryStorage } from '@/hooks/useHistoryStorage';
 
 const Index = () => {
+  const { addEntry } = useHistoryStorage();
   const [image, setImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -62,6 +64,10 @@ const Index = () => {
 
       if (data.result) {
         setResult(data.result);
+        // Save to history
+        if (image) {
+          addEntry(image, data.result);
+        }
       } else {
         throw new Error('No se pudo obtener el análisis. Intenta con otra foto más clara del cielo. 🌃');
       }
@@ -79,12 +85,12 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden">
+    <div className="min-h-screen relative overflow-x-hidden pt-16">
       {/* Animated star background */}
       <StarField />
 
       {/* Main content */}
-      <main className="relative z-10 container mx-auto px-5 py-10 md:py-16 max-w-xl">
+      <main className="relative z-10 container mx-auto px-5 py-10 md:py-14 max-w-xl">
         {/* Header */}
         <header className="text-center mb-10 md:mb-14 animate-fade-in">
           {/* Logo/Icon */}
