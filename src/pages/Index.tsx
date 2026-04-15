@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, AlertCircle, Sparkles } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ResultCard from '@/components/ResultCard';
@@ -19,13 +19,55 @@ const constellations = [
   'Casiopea',
 ];
 
+const CONSTELLATION_PATHS: Record<string, string> = {
+  'Andrómeda': 'M7 18 L12 12 L18 6 M12 12 L6 6 M15 9 L17 13',
+  'Orión': 'M8 5 L16 5 L14 12 L10 12 Z M10 12 L7 20 L17 20 L14 12 M9 12 L15 12',
+  'Pegaso': 'M8 10 L18 10 L16 20 L6 20 Z M18 10 L22 4 M8 10 L3 6',
+  'Cisne': 'M12 3 L12 21 M5 11 L12 14 L19 9',
+  'Lira': 'M12 4 L9 10 L15 10 L18 18 L6 18 Z',
+  'Osa Mayor': 'M3 11 L8 9 L13 11 L15 17 L21 16 L19 10 L13 11',
+  'Escorpión': 'M5 7 L10 5 L14 9 L13 16 L9 20 L5 17 L6 14',
+  'Casiopea': 'M4 7 L9 17 L13 10 L17 16 L21 6',
+};
+
+const ConstellationIcon = ({ name, className }: { name: string; className?: string }) => {
+  const d = CONSTELLATION_PATHS[name];
+  if (!d) return null;
+
+  const vertices = d.match(/[ML]\s*(\d+)\s+(\d+)/g)?.map((m) => {
+    const [, x, y] = m.match(/(\d+)\s+(\d+)/)!;
+    return { x: Number(x), y: Number(y) };
+  }) ?? [];
+
+  const unique = vertices.filter(
+    (v, i, arr) => arr.findIndex((u) => u.x === v.x && u.y === v.y) === i
+  );
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d={d} />
+      {unique.map((v, i) => (
+        <circle key={i} cx={v.x} cy={v.y} r="1" fill="currentColor" stroke="none" />
+      ))}
+    </svg>
+  );
+};
+
 const Index = () => {
   const { addEntry } = useHistoryStorage();
   const [image, setImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [activeCono, setActiveCono] = useState(0);
+  const [activeCono, setActiveCono] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -127,7 +169,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-slate-950/90" />
       </div>
 
-      <main className="relative z-10 container mx-auto px-6 lg:px-10 pt-24 pb-16">
+      <main className="relative z-10 container mx-auto px-6 lg:px-10 pt-8 pb-16">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -140,22 +182,40 @@ const Index = () => {
               CONOS
             </p>
             <nav className="space-y-1">
-              {constellations.map((name, i) => (
-                <button
-                  key={name}
-                  type="button"
-                  onClick={() => setActiveCono(i)}
-                  className={`
-                    w-full text-left py-2.5 px-1 text-sm font-light transition-all duration-300 cursor-pointer
-                    ${activeCono === i
-                      ? 'text-white translate-x-2'
-                      : 'text-slate-400 hover:text-white hover:translate-x-2'
-                    }
-                  `}
-                >
-                  {name}
-                </button>
-              ))}
+              {constellations.map((name) => {
+                const isActive = activeCono === name;
+                return (
+                  <div key={name} className="relative">
+                    <AnimatePresence>
+                      {isActive && (
+                        <motion.div
+                          className="absolute top-1/2 right-full mr-3 -translate-y-1/2 text-white/80 pointer-events-none"
+                          initial={{ opacity: 0, scale: 0.5, x: 20 }}
+                          animate={{ opacity: 1, scale: 1.8, x: -40 }}
+                          exit={{ opacity: 0, scale: 0.5, x: 20 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                        >
+                          <ConstellationIcon name={name} className="w-8 h-8" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCono(isActive ? null : name)}
+                      className={`
+                        w-full text-left py-2.5 px-1
+                        text-sm font-extralight transition-all duration-300 cursor-pointer
+                        ${isActive
+                          ? 'text-white'
+                          : 'text-slate-400 hover:text-white'
+                        }
+                      `}
+                    >
+                      {name}
+                    </button>
+                  </div>
+                );
+              })}
             </nav>
           </motion.aside>
 

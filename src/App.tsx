@@ -10,7 +10,6 @@ import { useHistoryStorage } from "./hooks/useHistoryStorage";
 
 const queryClient = new QueryClient();
 const Index = lazy(() => import("./pages/Index"));
-const Gallery = lazy(() => import("./pages/Gallery"));
 const History = lazy(() => import("./pages/History"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -29,7 +28,6 @@ const AppContent = () => {
       >
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/gallery" element={<Gallery />} />
           <Route path="/history" element={<History />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

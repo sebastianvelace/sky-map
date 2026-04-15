@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { X, Calendar, Star } from 'lucide-react';
+import { X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { HistoryEntry } from '@/hooks/useHistoryStorage';
 import ResultCard from './ResultCard';
@@ -11,7 +11,6 @@ interface HistoryDetailModalProps {
 }
 
 const HistoryDetailModal = ({ entry, isOpen, onClose }: HistoryDetailModalProps) => {
-  // Handle ESC key
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') onClose();
   }, [onClose]);
@@ -29,12 +28,12 @@ const HistoryDetailModal = ({ entry, isOpen, onClose }: HistoryDetailModalProps)
 
   const formattedDate = entry
     ? new Date(entry.timestamp).toLocaleDateString('es-ES', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
       })
     : '';
 
@@ -42,7 +41,7 @@ const HistoryDetailModal = ({ entry, isOpen, onClose }: HistoryDetailModalProps)
     <AnimatePresence>
       {isOpen && entry ? (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto p-4 pb-10 pt-8"
+          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto p-4 pb-12 pt-10"
           onClick={onClose}
           role="dialog"
           aria-modal="true"
@@ -52,49 +51,47 @@ const HistoryDetailModal = ({ entry, isOpen, onClose }: HistoryDetailModalProps)
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="fixed inset-0 bg-background/90 backdrop-blur-md"
+            className="fixed inset-0 bg-slate-950/90"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           />
 
           <motion.div
-            className="relative z-10 w-full max-w-3xl overflow-hidden rounded-3xl border border-cosmic-blue/20 bg-[#070b1a]/95 shadow-[0_0_40px_rgba(20,81,138,0.25)]"
+            className="relative z-10 mt-4 w-full max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40"
             onClick={(e) => e.stopPropagation()}
-            initial={{ opacity: 0, y: 20, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
           >
             <button
+              type="button"
               onClick={onClose}
-              className="absolute right-4 top-4 z-20 rounded-full border border-cosmic-blue/30 bg-background/50 p-2 transition-colors hover:bg-background/80"
+              className="absolute right-4 top-4 z-20 border border-white/10 bg-transparent p-2 text-white transition-all duration-300 hover:border-white/25 hover:bg-white/5"
               aria-label="Cerrar modal"
             >
-              <X size={20} className="text-foreground" />
+              <X size={18} strokeWidth={1} />
             </button>
 
-            <div className="relative h-56 overflow-hidden">
+            <div className="relative h-52 overflow-hidden sm:h-56">
               <img src={entry.imageBase64} alt="Foto del cielo analizada" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#070b1a] via-[#070b1a]/70 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <div className="mb-2 flex items-center gap-2 text-cosmic-gold">
-                  <Star size={16} />
-                  <span className="text-sm font-semibold uppercase tracking-[0.16em]">
-                    {entry.extractedName || 'Análisis del cielo'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-300">
-                  <Calendar size={14} />
-                  <span className="capitalize">{formattedDate}</span>
-                </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 space-y-2 p-6">
+                <h2
+                  id="history-modal-title"
+                  className="text-sm font-extralight uppercase tracking-[0.28em] text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]"
+                >
+                  {entry.extractedName || 'Análisis del cielo'}
+                </h2>
+                <p className="text-xs font-light capitalize text-slate-400">
+                  {formattedDate}
+                </p>
               </div>
             </div>
 
-            <div className="max-h-[60vh] overflow-y-auto p-5 pr-3 md:p-6 md:pr-4 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cosmic-blue/50 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-2">
-              <div className="rounded-2xl border border-cosmic-blue/20 bg-black/20 p-1 [&_.result-content]:space-y-2 [&_.result-content_h1]:tracking-wide [&_.result-content_h1]:leading-snug [&_.result-content_h2]:tracking-wide [&_.result-content_h2]:leading-snug [&_.result-content_h3]:tracking-wide [&_.result-content_p]:leading-8 [&_.result-content_p]:text-[1.03rem] [&_.result-content_li]:leading-8 [&_.result-content_li]:text-[1.02rem]">
-                <ResultCard result={entry.result} />
-              </div>
+            <div className="max-h-[58vh] overflow-y-auto px-5 py-6 md:px-8 md:py-8 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5">
+              <ResultCard result={entry.result} />
             </div>
           </motion.div>
         </motion.div>

@@ -11,14 +11,15 @@ const Navbar = ({ historyCount = 0 }: NavbarProps) => {
 
   const navItems = [
     { path: '/', label: 'Inicio' },
-    { path: '/gallery', label: 'Constelaciones' },
     { path: '/history', label: 'Historial', badge: historyCount },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
+    <nav className="relative z-10 w-full">
       <div className="container mx-auto px-6 lg:px-10">
-        <div className="flex items-center justify-center h-16 gap-10">
+        <div className="grid grid-cols-1 xl:grid-cols-[200px_1fr] gap-16 items-center min-h-16">
+          <div className="hidden xl:block" aria-hidden />
+          <div className="flex items-center justify-center min-h-16 gap-20 sm:gap-24">
           {navItems.map(({ path, label, badge }) => (
             <Link
               key={path}
@@ -44,6 +45,7 @@ const Navbar = ({ historyCount = 0 }: NavbarProps) => {
               )}
             </Link>
           ))}
+          </div>
         </div>
       </div>
     </nav>
