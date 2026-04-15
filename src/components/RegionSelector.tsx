@@ -1,4 +1,3 @@
-import { Globe, MapPin } from 'lucide-react';
 import { Region, regionLabels } from '@/data/constellations';
 
 interface RegionSelectorProps {
@@ -15,42 +14,36 @@ const regions: { id: Region; icon: string; description: string }[] = [
 const RegionSelector = ({ selectedRegion, onRegionChange }: RegionSelectorProps) => {
   return (
     <div className="w-full">
-      {/* Pills container with horizontal scroll on mobile */}
-      <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+      <p className="text-[10px] font-semibold tracking-[0.3em] text-slate-500 uppercase mb-6">
+        CONOS
+      </p>
+      <div className="space-y-1">
         {regions.map((region) => {
           const isSelected = selectedRegion === region.id;
-          
+
           return (
             <button
               key={region.id}
               onClick={() => onRegionChange(region.id)}
               className={`
-                relative flex-shrink-0 snap-center
-                flex items-center gap-2 px-4 py-3 md:px-5 md:py-3
-                rounded-full font-medium text-sm md:text-base
-                transition-all duration-500 ease-out
-                ${isSelected 
-                  ? 'bg-gradient-to-r from-cosmic-blue to-cosmic-purple text-white shadow-glow-blue scale-105' 
-                  : 'glass-card text-muted-foreground hover:text-foreground hover:bg-secondary/60 border border-border/30'
+                w-full text-left py-2.5 px-1
+                text-sm font-light text-slate-300
+                transition-all duration-300
+                ${isSelected
+                  ? 'text-white translate-x-2'
+                  : 'hover:text-white hover:translate-x-2'
                 }
               `}
               aria-label={`Seleccionar ${regionLabels[region.id]}`}
               aria-pressed={isSelected}
             >
-              <span className="text-lg">{region.icon}</span>
-              <span className="whitespace-nowrap">{regionLabels[region.id]}</span>
-              
-              {/* Selection indicator */}
-              {isSelected && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-cosmic-gold rounded-full animate-pulse" />
-              )}
+              {regionLabels[region.id]}
             </button>
           );
         })}
       </div>
-      
-      {/* Description text */}
-      <p className="mt-3 text-xs text-muted-foreground/70 text-center animate-fade-in">
+
+      <p className="mt-6 text-[11px] text-slate-500/70 font-light tracking-wide">
         {regions.find(r => r.id === selectedRegion)?.description}
       </p>
     </div>

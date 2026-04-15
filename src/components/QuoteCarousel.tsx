@@ -23,7 +23,7 @@ const QuoteCarousel = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setIsVisible(false);
-      
+
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % QUOTES.length);
         setIsVisible(true);
@@ -36,19 +36,19 @@ const QuoteCarousel = () => {
   const currentQuote = QUOTES[currentIndex];
 
   return (
-    <div className="relative h-20 flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-[4.5rem] flex items-center justify-center overflow-hidden">
       <div
-        className={`text-center px-4 transition-all duration-500 ease-out ${
-          isVisible 
-            ? 'opacity-100 transform translate-y-0' 
-            : 'opacity-0 transform translate-y-2'
+        className={`w-full text-center transition-all duration-500 ease-out ${
+          isVisible
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 translate-y-2'
         }`}
       >
-        <p className="text-muted-foreground text-sm md:text-base italic leading-relaxed max-w-md mx-auto">
+        <p className="text-slate-400 text-base sm:text-lg font-light italic leading-relaxed max-w-2xl mx-auto">
           "{currentQuote.text}"
         </p>
         {currentQuote.author && (
-          <p className="text-muted-foreground/60 text-xs mt-2 font-medium">
+          <p className="text-slate-500 text-xs sm:text-sm mt-2 font-light tracking-wide">
             — {currentQuote.author}
           </p>
         )}

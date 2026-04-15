@@ -1,17 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Camera,
-  Telescope,
-  AlertCircle,
-  Sparkles,
-  Star,
-  Orbit,
-  Rocket,
-  Radar,
-  Satellite,
-  Stars,
-} from 'lucide-react';
+import { Camera, AlertCircle, Sparkles } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ResultCard from '@/components/ResultCard';
 import QuoteCarousel from '@/components/QuoteCarousel';
@@ -19,13 +8,25 @@ import CosmosQA from '@/components/CosmosQA';
 import { supabase } from '@/integrations/supabase/client';
 import { useHistoryStorage } from '@/hooks/useHistoryStorage';
 
+const constellations = [
+  'Andrómeda',
+  'Orión',
+  'Pegaso',
+  'Cisne',
+  'Lira',
+  'Osa Mayor',
+  'Escorpión',
+  'Casiopea',
+];
+
 const Index = () => {
   const { addEntry } = useHistoryStorage();
   const [image, setImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+  const [activeCono, setActiveCono] = useState(0);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,14 +56,13 @@ const Index = () => {
     setError(null);
 
     try {
-      // Extract base64 data from data URL
       const base64Data = image.split(',')[1];
       const mimeType = image.split(';')[0].split(':')[1];
 
       const { data, error: functionError } = await supabase.functions.invoke('analyze-sky', {
-        body: { 
-          imageBase64: base64Data, 
-          mimeType 
+        body: {
+          imageBase64: base64Data,
+          mimeType
         }
       });
 
@@ -76,7 +76,6 @@ const Index = () => {
 
       if (data.result) {
         setResult(data.result);
-        // Save to history
         if (image) {
           addEntry(image, data.result);
         }
@@ -97,202 +96,183 @@ const Index = () => {
   };
 
   const containerVariants = {
-    hidden: { opacity: 0, y: 24 },
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      y: 0,
       transition: {
-        duration: 0.6,
-        ease: 'easeOut',
-        staggerChildren: 0.12,
+        duration: 0.8,
+        ease: [0.25, 0.1, 0.25, 1],
+        staggerChildren: 0.1,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 16 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: 'easeOut' },
+      transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
     },
   };
 
-  const conoItems = [
-    { name: 'Andrómeda', icon: Orbit, active: true },
-    { name: 'Orión', icon: Stars, active: false },
-    { name: 'Pegaso', icon: Rocket, active: false },
-    { name: 'Casiopea', icon: Radar, active: false },
-    { name: 'Aquila', icon: Satellite, active: false },
-  ];
-
   return (
-    <div className="min-h-screen relative overflow-x-hidden pt-20">
+    <div className="min-h-screen relative overflow-x-hidden">
       <div className="fixed inset-0 z-[-10]">
         <img
           src="/bg-cosmos.jpg"
-          alt="Cosmos background"
+          alt=""
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-slate-950/85" />
+        <div className="absolute inset-0 bg-slate-950/90" />
       </div>
 
-      <main className="relative z-10 container mx-auto px-5 py-8 md:py-12">
+      <main className="relative z-10 container mx-auto px-6 lg:px-10 pt-24 pb-16">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 xl:grid-cols-12 gap-6"
+          className="grid grid-cols-1 xl:grid-cols-[200px_1fr] gap-16"
         >
-          <motion.aside
-            variants={itemVariants}
-            className="xl:col-span-3 bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
-          >
-            <p className="text-xs tracking-[0.2em] text-slate-500 uppercase mb-6">CONOS</p>
-            <div className="space-y-2">
-              {conoItems.map(({ name, icon: Icon, active }) => (
+          {/* Sidebar — Constellation list */}
+          <motion.aside variants={itemVariants} className="hidden xl:block pt-4">
+            <p className="text-[10px] font-semibold tracking-[0.3em] text-slate-500 uppercase mb-8">
+              CONOS
+            </p>
+            <nav className="space-y-1">
+              {constellations.map((name, i) => (
                 <button
                   key={name}
                   type="button"
-                  className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl text-slate-400 transition-all duration-300 cursor-pointer ${
-                    active ? 'bg-slate-800/60 border border-slate-700 text-slate-50' : 'hover:bg-slate-800/60 hover:border hover:border-slate-700 hover:text-slate-50'
-                  }`}
+                  onClick={() => setActiveCono(i)}
+                  className={`
+                    w-full text-left py-2.5 px-1 text-sm font-light transition-all duration-300 cursor-pointer
+                    ${activeCono === i
+                      ? 'text-white translate-x-2'
+                      : 'text-slate-400 hover:text-white hover:translate-x-2'
+                    }
+                  `}
                 >
-                  <Icon className="w-4 h-4" />
-                  <span className="text-sm font-medium">{name}</span>
+                  {name}
                 </button>
               ))}
-            </div>
+            </nav>
           </motion.aside>
 
-          <div className="xl:col-span-9 space-y-6">
+          {/* Main content */}
+          <div className="flex flex-col min-h-[calc(100dvh-5rem)]">
+            {/* Hero — centrado en viewport, más grande */}
             <motion.section
               variants={itemVariants}
-              className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
+              className="min-h-[calc(100dvh-6.5rem)] flex flex-col items-center justify-center text-center px-2 py-8"
             >
-              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
-                <div>
-                  <div className="inline-flex items-center justify-center mb-6">
-                    <div className="p-4 rounded-2xl bg-slate-800/70 border border-slate-700/80">
-                      <Telescope className="w-10 h-10 text-sky-200" />
-                    </div>
-                  </div>
-                  <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-sky-200/70">
-                    Stars.AI
-                  </h1>
-                  <p className="text-slate-300 text-base md:text-lg max-w-2xl">
-                    Centro de telemetría celeste para identificar estrellas y constelaciones del cielo nocturno en tiempo real.
-                  </p>
-                </div>
-                <div className="lg:max-w-sm w-full">
-                  <QuoteCarousel />
-                </div>
+              <h1 className="text-white font-extralight text-7xl sm:text-8xl lg:text-9xl uppercase tracking-[0.35em] sm:tracking-[0.4em] drop-shadow-[0_0_24px_rgba(255,255,255,0.65)] mb-10 lg:mb-12">
+                Stars.AI
+              </h1>
+              <p className="text-slate-300 font-extralight text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed tracking-[0.2em] sm:tracking-[0.28em] uppercase">
+                EXPLORING THE COSMIC VOID.
+                <br />
+                BEYOND THE HORIZON.
+              </p>
+              <div className="mt-12 lg:mt-14 w-full max-w-3xl mx-auto">
+                <QuoteCarousel />
               </div>
             </motion.section>
 
+            {/* Camera — más abajo, centrado */}
             <motion.section
               variants={itemVariants}
-              className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
+              className="flex justify-center mt-10 md:mt-16 lg:mt-24 mb-16 md:mb-20 lg:mb-24"
             >
-              <section className="space-y-5">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handleImageCapture}
-                  className="hidden"
-                />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleImageCapture}
+                className="hidden"
+              />
 
-                {!image && (
-                  <button
-                    onClick={triggerCamera}
-                    className="w-full py-5 md:py-6 rounded-2xl font-semibold text-lg shadow-[0_0_40px_rgba(56,189,248,0.25)] hover:shadow-[0_0_50px_rgba(56,189,248,0.4)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 bg-gradient-to-r from-sky-400 to-violet-500 text-slate-950"
-                    aria-label="Tomar foto del cielo nocturno"
-                  >
-                    <Camera size={24} />
-                    <span>Tomar foto del cielo</span>
-                  </button>
-                )}
+              {!image && (
+                <button
+                  onClick={triggerCamera}
+                  className="group flex items-center justify-center gap-4 text-white/80 hover:text-white transition-all duration-300"
+                  aria-label="Tomar foto del cielo nocturno"
+                >
+                  <span className="flex items-center justify-center w-14 h-14 rounded-full border border-white/20 group-hover:border-white/50 transition-all duration-300 group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,0.3)]">
+                    <Camera size={22} className="text-white/70 group-hover:text-white transition-colors duration-300" />
+                  </span>
+                  <span className="text-sm font-light tracking-widest uppercase">
+                    Tomar foto del cielo
+                  </span>
+                </button>
+              )}
 
-                {image && (
-                  <div className="space-y-5">
-                    <div className="relative rounded-3xl overflow-hidden border border-slate-700/70 shadow-2xl shadow-slate-950/40">
-                      <img
-                        src={image}
-                        alt="Foto del cielo nocturno"
-                        className="w-full h-auto max-h-[400px] object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
-                    </div>
-
-                    <div className="flex gap-4">
-                      <button
-                        onClick={resetApp}
-                        className="flex-1 py-4 bg-slate-800/70 hover:bg-slate-700/80 text-slate-100 rounded-2xl font-medium transition-all duration-300 flex items-center justify-center gap-2 border border-slate-700/80"
-                        aria-label="Tomar nueva foto"
-                      >
-                        <Camera size={18} />
-                        Nueva foto
-                      </button>
-
-                      <button
-                        onClick={analyzeImage}
-                        disabled={isAnalyzing}
-                        className="flex-[2] py-4 rounded-2xl font-semibold shadow-[0_0_40px_rgba(139,92,246,0.25)] hover:shadow-[0_0_55px_rgba(139,92,246,0.45)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500 to-sky-400 text-slate-950"
-                        aria-label="Analizar imagen del cielo"
-                      >
-                        <Sparkles size={18} />
-                        <span>Analizar mi cielo ✨</span>
-                      </button>
-                    </div>
+              {image && (
+                <div className="space-y-8">
+                  <div className="relative rounded-2xl overflow-hidden max-w-2xl">
+                    <img
+                      src={image}
+                      alt="Foto del cielo nocturno"
+                      className="w-full h-auto max-h-[400px] object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
                   </div>
-                )}
-              </section>
+
+                  <div className="flex gap-6">
+                    <button
+                      onClick={resetApp}
+                      className="flex items-center gap-2 text-slate-400 hover:text-white text-sm font-light tracking-wider uppercase transition-all duration-300 hover:translate-x-1"
+                      aria-label="Tomar nueva foto"
+                    >
+                      <Camera size={16} />
+                      Nueva foto
+                    </button>
+
+                    <button
+                      onClick={analyzeImage}
+                      disabled={isAnalyzing}
+                      className="flex items-center gap-2 text-white text-sm font-light tracking-wider uppercase transition-all duration-300 hover:drop-shadow-[0_0_12px_rgba(255,255,255,0.4)] disabled:opacity-40 disabled:cursor-not-allowed hover:translate-x-1"
+                      aria-label="Analizar imagen del cielo"
+                    >
+                      <Sparkles size={16} />
+                      Analizar mi cielo
+                    </button>
+                  </div>
+                </div>
+              )}
             </motion.section>
 
-            {isAnalyzing && (
-              <motion.section
-                variants={itemVariants}
-                className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
-              >
-                <LoadingSpinner />
-              </motion.section>
-            )}
+            <div className="flex-1 space-y-16 lg:space-y-20 pb-8 min-h-0">
+              {/* Loading */}
+              {isAnalyzing && (
+                <motion.section variants={itemVariants}>
+                  <LoadingSpinner />
+                </motion.section>
+              )}
 
-            {error && (
-              <motion.section
-                variants={itemVariants}
-                className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
-                role="alert"
-              >
-                <div className="flex items-start gap-4">
-                  <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-                  <p className="text-slate-100 text-sm leading-relaxed">{error}</p>
-                </div>
-              </motion.section>
-            )}
+              {/* Error */}
+              {error && (
+                <motion.section variants={itemVariants} role="alert">
+                  <div className="flex items-start gap-4">
+                    <AlertCircle className="w-4 h-4 text-red-400/80 flex-shrink-0 mt-0.5" />
+                    <p className="text-slate-300 text-sm font-light leading-relaxed">{error}</p>
+                  </div>
+                </motion.section>
+              )}
 
-            {result && !isAnalyzing && (
-              <motion.section variants={itemVariants}>
-                <ResultCard result={result} />
-              </motion.section>
-            )}
+              {/* Results */}
+              {result && !isAnalyzing && (
+                <motion.section variants={itemVariants}>
+                  <ResultCard result={result} />
+                </motion.section>
+              )}
+            </div>
 
-            <motion.section
-              variants={itemVariants}
-              className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
-            >
+            {/* Q&A — pegado al final del viewport cuando hay poco contenido */}
+            <motion.section variants={itemVariants} className="mt-auto shrink-0 pt-16 lg:pt-24 pb-10 lg:pb-14">
               <CosmosQA />
             </motion.section>
-
-            <motion.footer variants={itemVariants} className="text-center pb-4">
-              <div className="inline-flex items-center gap-2 text-slate-400/70 text-xs">
-                <Star size={12} className="text-sky-200/70" />
-                <span>Stars.ai — Powered by Google Gemini</span>
-                <Star size={12} className="text-sky-200/70" />
-              </div>
-            </motion.footer>
           </div>
         </motion.div>
       </main>
