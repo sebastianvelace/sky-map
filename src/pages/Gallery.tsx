@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Compass, Sparkles, Globe } from 'lucide-react';
+import { Sparkles, Globe } from 'lucide-react';
 import StarField from '@/components/StarField';
 import ConstellationCard from '@/components/ConstellationCard';
 import RegionSelector from '@/components/RegionSelector';
-import { getConstellationsByRegion, Region, regionLabels } from '@/data/constellations';
+import { Region, regionLabels } from '@/data/constellations';
+import { useGalleryConstellations } from '@/hooks/useCosmosAPI';
 
 const Gallery = () => {
   const [selectedRegion, setSelectedRegion] = useState<Region>('equatorial');
-  const constellations = getConstellationsByRegion(selectedRegion);
+  const { constellations, isLoading, error } = useGalleryConstellations(selectedRegion);
 
   return (
     <div className="min-h-screen relative overflow-x-hidden pt-20 pb-10">
@@ -64,17 +65,31 @@ const Gallery = () => {
         </div>
 
         {/* Constellation Grid */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-          {constellations.map((constellation, index) => (
-            <div 
-              key={constellation.id}
-              style={{ animationDelay: `${index * 0.08}s` }}
-              className="animate-fade-in"
-            >
-              <ConstellationCard constellation={constellation} />
+        {isLoading ? (
+          <section className="animate-fade-in">
+            <div className="glass-card rounded-2xl p-8 text-center text-muted-foreground">
+              Cargando constelaciones...
             </div>
-          ))}
-        </section>
+          </section>
+        ) : error ? (
+          <section className="animate-fade-in">
+            <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-6 text-center text-destructive">
+              {error}
+            </div>
+          </section>
+        ) : (
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+            {constellations.map((constellation, index) => (
+              <div
+                key={constellation.id}
+                style={{ animationDelay: `${index * 0.08}s` }}
+                className="animate-fade-in"
+              >
+                <ConstellationCard constellation={constellation} />
+              </div>
+            ))}
+          </section>
+        )}
 
         {/* Footer note */}
         <footer className="mt-12 text-center">

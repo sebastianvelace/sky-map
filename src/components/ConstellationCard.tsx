@@ -1,5 +1,6 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState } from 'react';
 import { Star, Info, MapPin, Clock, Eye } from 'lucide-react';
+import { motion } from 'framer-motion';
 import ConstellationModal from './ConstellationModal';
 
 export interface ConstellationData {
@@ -30,14 +31,25 @@ const ConstellationCard = ({ constellation }: ConstellationCardProps) => {
 
   return (
     <>
-      <div 
-        className="group glass-card rounded-2xl overflow-hidden cursor-pointer transform transition-all duration-500 hover:scale-[1.02] hover:shadow-glow-blue"
+      <motion.div
+        className="group relative rounded-2xl overflow-hidden cursor-pointer border border-white/15 bg-white/[0.045] backdrop-blur-xl shadow-[0_14px_44px_hsl(222_45%_4%_/_0.45)] transition-colors duration-500 hover:border-cosmic-blue/40"
+        initial={{ opacity: 0, y: 26 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        whileHover={{
+          y: -8,
+          scale: 1.02,
+          boxShadow: '0 18px 56px hsl(217 80% 55% / 0.22), 0 0 30px hsl(204 90% 65% / 0.2)',
+        }}
         onClick={() => setIsModalOpen(true)}
         role="button"
         tabIndex={0}
         aria-label={`Ver detalles de ${constellation.name}`}
         onKeyDown={(e) => e.key === 'Enter' && setIsModalOpen(true)}
       >
+        <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/12 via-transparent to-cosmic-blue/10 opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
+
         {/* Image container with lazy loading */}
         <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
           {!imageLoaded && (
@@ -60,7 +72,7 @@ const ConstellationCard = ({ constellation }: ConstellationCardProps) => {
               setImageLoaded(true);
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/35 to-transparent opacity-85" />
           
           {/* Floating info icon */}
           <div className="absolute top-3 right-3 p-2 rounded-full bg-background/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
@@ -81,7 +93,7 @@ const ConstellationCard = ({ constellation }: ConstellationCardProps) => {
         </div>
 
         {/* Content */}
-        <div className="p-5 space-y-4">
+        <div className="relative p-5 space-y-4">
           {/* Title */}
           <div className="flex items-center justify-between">
             <h3 className="font-display text-xl font-semibold text-foreground group-hover:text-cosmic-gold transition-colors">
@@ -112,7 +124,7 @@ const ConstellationCard = ({ constellation }: ConstellationCardProps) => {
             <span className="text-xs font-medium text-cosmic-gold">{constellation.brightness}</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Modal */}
       <ConstellationModal 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Send, Sparkles, ChevronDown, MessageCircle, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useCosmosQA } from '@/hooks/useCosmosAPI';
 import {
   Accordion,
   AccordionContent,
@@ -8,61 +8,19 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-interface QAEntry {
-  id: string;
-  question: string;
-  answer: string;
-  timestamp: Date;
-}
-
 const CosmosQA = () => {
   const [question, setQuestion] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentAnswer, setCurrentAnswer] = useState<string | null>(null);
-  const [history, setHistory] = useState<QAEntry[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const { isLoading, currentAnswer, history, error, askQuestionAsync, clearError } = useCosmosQA();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim() || isLoading) return;
 
-    setIsLoading(true);
-    setError(null);
-    setCurrentAnswer(null);
-
     try {
-      const { data, error: functionError } = await supabase.functions.invoke('cosmos-qa', {
-        body: { question: question.trim() }
-      });
-
-      if (functionError) {
-        throw new Error(functionError.message || 'Error al conectar con el servidor');
-      }
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      if (data.answer) {
-        setCurrentAnswer(data.answer);
-        
-        // Add to history (keep last 5)
-        const newEntry: QAEntry = {
-          id: Date.now().toString(),
-          question: question.trim(),
-          answer: data.answer,
-          timestamp: new Date(),
-        };
-        
-        setHistory(prev => [newEntry, ...prev].slice(0, 5));
-        setQuestion('');
-      } else {
-        throw new Error('No se pudo obtener respuesta. Intenta reformular tu pregunta.');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-    } finally {
-      setIsLoading(false);
+      await askQuestionAsync(question.trim());
+      setQuestion('');
+    } catch {
+      // Error state is handled by React Query mutation
     }
   };
 
@@ -126,7 +84,10 @@ const CosmosQA = () => {
             <input
               type="text"
               value={question}
-              onChange={(e) => setQuestion(e.target.value)}
+              onChange={(e) => {
+                if (error) clearError();
+                setQuestion(e.target.value);
+              }}
               placeholder="Ej: ¿Qué constelación es visible ahora en mi región?"
               className="flex-1 bg-secondary/50 border border-border/30 rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-cosmic-purple/50 transition-all"
               disabled={isLoading}

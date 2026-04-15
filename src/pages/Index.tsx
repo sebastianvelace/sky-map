@@ -1,6 +1,17 @@
 import { useState, useRef } from 'react';
-import { Camera, Telescope, AlertCircle, Sparkles, Star } from 'lucide-react';
-import StarField from '@/components/StarField';
+import { motion } from 'framer-motion';
+import {
+  Camera,
+  Telescope,
+  AlertCircle,
+  Sparkles,
+  Star,
+  Orbit,
+  Rocket,
+  Radar,
+  Satellite,
+  Stars,
+} from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ResultCard from '@/components/ResultCard';
 import QuoteCarousel from '@/components/QuoteCarousel';
@@ -85,140 +96,205 @@ const Index = () => {
     setError(null);
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: 'easeOut',
+        staggerChildren: 0.12,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  };
+
+  const conoItems = [
+    { name: 'Andrómeda', icon: Orbit, active: true },
+    { name: 'Orión', icon: Stars, active: false },
+    { name: 'Pegaso', icon: Rocket, active: false },
+    { name: 'Casiopea', icon: Radar, active: false },
+    { name: 'Aquila', icon: Satellite, active: false },
+  ];
+
   return (
-    <div className="min-h-screen relative overflow-x-hidden pt-16">
-      {/* Animated star background */}
-      <StarField />
+    <div className="min-h-screen relative overflow-x-hidden pt-20">
+      <div className="fixed inset-0 z-[-10]">
+        <img
+          src="/bg-cosmos.jpg"
+          alt="Cosmos background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-slate-950/85" />
+      </div>
 
-      {/* Main content */}
-      <main className="relative z-10 container mx-auto px-5 py-10 md:py-14 max-w-xl">
-        {/* Header */}
-        <header className="text-center mb-10 md:mb-14 animate-fade-in">
-          {/* Logo/Icon */}
-          <div className="inline-flex items-center justify-center mb-8">
-            <div className="relative">
-              <div 
-                className="absolute inset-0 blur-2xl rounded-full animate-pulse-gold"
-                style={{ background: 'radial-gradient(circle, hsl(45 100% 55% / 0.3) 0%, transparent 70%)' }}
-              />
-              <div 
-                className="relative p-5 rounded-2xl border border-cosmic-gold/30"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(225 35% 12% / 0.8) 0%, hsl(225 35% 8% / 0.6) 100%)',
-                  backdropFilter: 'blur(12px)'
-                }}
-              >
-                <Telescope className="w-10 h-10 md:w-12 md:h-12 text-cosmic-gold" />
-              </div>
+      <main className="relative z-10 container mx-auto px-5 py-8 md:py-12">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 xl:grid-cols-12 gap-6"
+        >
+          <motion.aside
+            variants={itemVariants}
+            className="xl:col-span-3 bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
+          >
+            <p className="text-xs tracking-[0.2em] text-slate-500 uppercase mb-6">CONOS</p>
+            <div className="space-y-2">
+              {conoItems.map(({ name, icon: Icon, active }) => (
+                <button
+                  key={name}
+                  type="button"
+                  className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl text-slate-400 transition-all duration-300 cursor-pointer ${
+                    active ? 'bg-slate-800/60 border border-slate-700 text-slate-50' : 'hover:bg-slate-800/60 hover:border hover:border-slate-700 hover:text-slate-50'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span className="text-sm font-medium">{name}</span>
+                </button>
+              ))}
             </div>
-          </div>
+          </motion.aside>
 
-          {/* Title */}
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-wide">
-            <span className="text-cosmic-gold">★</span> Stars.ai
-          </h1>
-          <p className="text-muted-foreground text-base md:text-lg max-w-sm mx-auto mb-6">
-            Identifica estrellas y constelaciones del cielo nocturno
-          </p>
-
-          {/* Rotating quotes carousel */}
-          <QuoteCarousel />
-        </header>
-
-        {/* Camera capture section */}
-        <section className="space-y-5 mb-8">
-          {/* Hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleImageCapture}
-            className="hidden"
-          />
-
-          {/* Camera button */}
-          {!image && (
-            <button
-              onClick={triggerCamera}
-              className="w-full py-5 md:py-6 rounded-2xl font-semibold text-lg shadow-glow-blue hover:shadow-[0_0_50px_hsl(207_90%_70%_/_0.5)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 animate-pulse-glow btn-glow"
-              style={{
-                background: 'linear-gradient(135deg, hsl(207 90% 65%) 0%, hsl(207 90% 50%) 100%)',
-                color: 'hsl(228 35% 5%)'
-              }}
-              aria-label="Tomar foto del cielo nocturno"
+          <div className="xl:col-span-9 space-y-6">
+            <motion.section
+              variants={itemVariants}
+              className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
             >
-              <Camera size={24} />
-              <span>Tomar foto del cielo</span>
-            </button>
-          )}
+              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+                <div>
+                  <div className="inline-flex items-center justify-center mb-6">
+                    <div className="p-4 rounded-2xl bg-slate-800/70 border border-slate-700/80">
+                      <Telescope className="w-10 h-10 text-sky-200" />
+                    </div>
+                  </div>
+                  <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-sky-200/70">
+                    Stars.AI
+                  </h1>
+                  <p className="text-slate-300 text-base md:text-lg max-w-2xl">
+                    Centro de telemetría celeste para identificar estrellas y constelaciones del cielo nocturno en tiempo real.
+                  </p>
+                </div>
+                <div className="lg:max-w-sm w-full">
+                  <QuoteCarousel />
+                </div>
+              </div>
+            </motion.section>
 
-          {/* Image preview */}
-          {image && (
-            <div className="space-y-5 animate-fade-in-scale">
-              <div className="relative rounded-3xl overflow-hidden border border-border/30 shadow-card">
-                <img
-                  src={image}
-                  alt="Foto del cielo nocturno"
-                  className="w-full h-auto max-h-[400px] object-cover"
+            <motion.section
+              variants={itemVariants}
+              className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
+            >
+              <section className="space-y-5">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleImageCapture}
+                  className="hidden"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent pointer-events-none" />
+
+                {!image && (
+                  <button
+                    onClick={triggerCamera}
+                    className="w-full py-5 md:py-6 rounded-2xl font-semibold text-lg shadow-[0_0_40px_rgba(56,189,248,0.25)] hover:shadow-[0_0_50px_rgba(56,189,248,0.4)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 bg-gradient-to-r from-sky-400 to-violet-500 text-slate-950"
+                    aria-label="Tomar foto del cielo nocturno"
+                  >
+                    <Camera size={24} />
+                    <span>Tomar foto del cielo</span>
+                  </button>
+                )}
+
+                {image && (
+                  <div className="space-y-5">
+                    <div className="relative rounded-3xl overflow-hidden border border-slate-700/70 shadow-2xl shadow-slate-950/40">
+                      <img
+                        src={image}
+                        alt="Foto del cielo nocturno"
+                        className="w-full h-auto max-h-[400px] object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
+                    </div>
+
+                    <div className="flex gap-4">
+                      <button
+                        onClick={resetApp}
+                        className="flex-1 py-4 bg-slate-800/70 hover:bg-slate-700/80 text-slate-100 rounded-2xl font-medium transition-all duration-300 flex items-center justify-center gap-2 border border-slate-700/80"
+                        aria-label="Tomar nueva foto"
+                      >
+                        <Camera size={18} />
+                        Nueva foto
+                      </button>
+
+                      <button
+                        onClick={analyzeImage}
+                        disabled={isAnalyzing}
+                        className="flex-[2] py-4 rounded-2xl font-semibold shadow-[0_0_40px_rgba(139,92,246,0.25)] hover:shadow-[0_0_55px_rgba(139,92,246,0.45)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500 to-sky-400 text-slate-950"
+                        aria-label="Analizar imagen del cielo"
+                      >
+                        <Sparkles size={18} />
+                        <span>Analizar mi cielo ✨</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </section>
+            </motion.section>
+
+            {isAnalyzing && (
+              <motion.section
+                variants={itemVariants}
+                className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
+              >
+                <LoadingSpinner />
+              </motion.section>
+            )}
+
+            {error && (
+              <motion.section
+                variants={itemVariants}
+                className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
+                role="alert"
+              >
+                <div className="flex items-start gap-4">
+                  <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                  <p className="text-slate-100 text-sm leading-relaxed">{error}</p>
+                </div>
+              </motion.section>
+            )}
+
+            {result && !isAnalyzing && (
+              <motion.section variants={itemVariants}>
+                <ResultCard result={result} />
+              </motion.section>
+            )}
+
+            <motion.section
+              variants={itemVariants}
+              className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-8"
+            >
+              <CosmosQA />
+            </motion.section>
+
+            <motion.footer variants={itemVariants} className="text-center pb-4">
+              <div className="inline-flex items-center gap-2 text-slate-400/70 text-xs">
+                <Star size={12} className="text-sky-200/70" />
+                <span>Stars.ai — Powered by Google Gemini</span>
+                <Star size={12} className="text-sky-200/70" />
               </div>
-
-              {/* Action buttons */}
-              <div className="flex gap-4">
-                <button
-                  onClick={resetApp}
-                  className="flex-1 py-4 glass-button hover:bg-secondary/60 text-foreground rounded-2xl font-medium transition-all duration-300 flex items-center justify-center gap-2 border border-border/30"
-                  aria-label="Tomar nueva foto"
-                >
-                  <Camera size={18} />
-                  Nueva foto
-                </button>
-                
-                <button
-                  onClick={analyzeImage}
-                  disabled={isAnalyzing}
-                  className="flex-[2] py-4 rounded-2xl font-semibold shadow-glow-gold hover:shadow-[0_0_50px_hsl(45_100%_55%_/_0.5)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed btn-gold-glow"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(45 100% 55%) 0%, hsl(38 90% 50%) 100%)',
-                    color: 'hsl(228 35% 5%)'
-                  }}
-                  aria-label="Analizar imagen del cielo"
-                >
-                  <Sparkles size={18} />
-                  <span>Analizar mi cielo ✨</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </section>
-
-        {/* Loading state */}
-        {isAnalyzing && <LoadingSpinner />}
-
-        {/* Error message */}
-        {error && (
-          <div className="glass-card rounded-2xl p-5 flex items-start gap-4 mb-8 border-destructive/30 animate-fade-in" role="alert">
-            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-            <p className="text-foreground text-sm leading-relaxed">{error}</p>
+            </motion.footer>
           </div>
-        )}
-
-        {/* Results */}
-        {result && !isAnalyzing && <ResultCard result={result} />}
-
-        {/* Q&A Section */}
-        <CosmosQA />
-
-        {/* Footer note */}
-        <footer className="mt-16 text-center animate-fade-in">
-          <div className="inline-flex items-center gap-2 text-muted-foreground/50 text-xs">
-            <Star size={12} className="text-cosmic-gold/60" />
-            <span>Stars.ai — Powered by Google Gemini</span>
-            <Star size={12} className="text-cosmic-gold/60" />
-          </div>
-        </footer>
+        </motion.div>
       </main>
     </div>
   );

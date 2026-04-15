@@ -148,6 +148,7 @@ function toast({ ...props }: Toast) {
     type: "ADD_TOAST",
     toast: {
       ...props,
+      variant: props.variant ?? "success",
       id,
       open: true,
       onOpenChange: (open) => {
