@@ -1,32 +1,32 @@
-# Stars.ai 🌌  
-**Identificador de constelaciones con IA – Especial para el cielo de
+# Stars.ai
+Centro de telemetría celeste para identificación de estrellas y constelaciones.
 
-Vivo a 2.600 metros de altura, donde el cielo nocturno es espectacular cuando no hay nubes ni tanta luz de la ciudad... pero igual a veces es complicado identificar qué estás viendo.  
+## Descripción
+Plataforma web diseñada para capturar y analizar el cielo nocturno mediante inteligencia artificial. El sistema permite la identificación de cuerpos celestes y patrones estelares a partir de fotografías, proporcionando datos técnicos y mitológicos.
 
-Por eso creé **Stars.ai**: una app web sencilla que usa inteligencia artificial para que tomes una foto del cielo con tu celular y te diga exactamente qué constelaciones, estrellas o planetas estás mirando. Además, puedes hacerle preguntas tipo chat sobre lo que ves: "¿Esa es Orión?", "¿Cuándo veré la Cruz del Sur bien?", o curiosidades sobre mitología.
+## Características Técnicas
+- Interfaz Naked UI: Diseño minimalista de alto contraste optimizado para entornos oscuros, eliminando contenedores y marcos visuales.
+- Análisis de Imágenes: Procesamiento de fotografías mediante modelos de visión para reconocimiento estelar.
+- Historial: Almacenamiento local de capturas y resultados técnicos previos.
+- Esquemas de Constelaciones: Representación geométrica de constelaciones mediante vectores SVG anatómicamente precisos.
+- CosmosQA: Sistema de consulta interactiva sobre astronomía integrado en la plataforma.
 
-### Cómo usarla (súper fácil)
-1. Abre la app: https://sky-map-bogota.lovable.app  
-2. Dale al botón grande **"Tomar foto del cielo"** (usa la cámara de tu teléfono).  
-3. Sube la foto y espera unos segundos – la IA analiza las estrellas.  
-4. Pregúntale lo que quieras con **"Pregunta al Cosmos"** – ¡responde en español!  
+## Stack Tecnológico
+- Frontend: React, Vite.
+- Estilos y Animaciones: Tailwind CSS, Framer Motion.
+- Iconografía: Lucide React.
+- Backend: Supabase (Edge Functions).
+- IA: Google Gemini API.
 
-Funciona mejor en noches claras, lejos de postes de luz, y apuntando hacia arriba. Prueba en el norte o sur de la ciudad para ver diferencias.
+## Instalación
+1. Clonar el repositorio.
+2. Instalar dependencias:
+   npm install
+3. Configurar variables de entorno (.env):
+   VITE_SUPABASE_URL=tu_url
+   VITE_SUPABASE_ANON_KEY=tu_key
+4. Iniciar servidor de desarrollo:
+   npm run dev
 
-### Tech stack (lo que usé debajo del capó)
-- Frontend: React + Next.js (para que sea rápida y responsive)  
-- IA para visión: Modelo de visión por computadora que detecta patrones estelares  
-- Backend: Procesamiento simple y chat integrado  
-- Deploy: En un host rápido y gratuito  
-
-### Capturas de pantalla
-(Aquí puedes subir 2-3 imágenes tuyas de la app en acción: una con la cámara, otra con resultados, y una con el chat. Sube las fotos al repo y pon links como ![Demo](screenshots/demo1.png))
-
-### ¿Quieres contribuir o mejorar?
-¡Claro que sí! Si tienes ideas (mejor manejo de contaminación lumínica, integración con clima de Bogotá, etc.), abre un issue o un PR.  
-
-Licencia: MIT – usa el código como quieras, solo dame crédito si lo compartes 😊
-
-
-Sebastian  
-Bogotá, enero 2026
+## Despliegue
+El proyecto está configurado para ser desplegado en plataformas compatibles con aplicaciones Vite y funciones de Supabase.
